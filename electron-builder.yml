@@ -1,0 +1,53 @@
+asar: true
+asarUnpack:
+  - bin/**
+extraFiles: []
+productName: Anylink Client
+appId: anylink-client
+directories:
+  output: build
+files:
+  - dist/electron/**/*
+
+dmg:
+  contents:
+    - x: 410
+      y: 150
+      type: link
+      path: /Applications
+    - x: 130
+      y: 150
+      type: file
+mac:
+  icon: config/icons/icon.icns
+  target: dmg
+  artifactName: "${productName}-${version}-mac-${arch}.${ext}"
+  extraResources:
+    - from: vpnagent/anylink_client_agent-darwin-${env.AGENT_ARCH}
+      to: bin/anylink_client_agent
+      filter:
+        - "**/*"
+win:
+  icon: config/icons/icon.ico
+  target: nsis
+  artifactName: "${productName}-${version}-win-${arch}.${ext}"
+  extraResources:
+    - from: vpnagent/anylink_client_agent-windows-${env.AGENT_ARCH}.exe
+      to: bin/anylink_client_agent.exe
+      filter:
+        - "**/*"
+linux:
+  icon: config/icons/icon.png
+  target: [tar.gz]
+  artifactName: "${productName}-${version}-linux-${arch}.${ext}"
+  extraResources:
+    - from: vpnagent/anylink_client_agent-linux-${env.AGENT_ARCH}
+      to: bin/anylink_client_agent
+      filter:
+        - "**/*"
+nsis:
+  include: installer.nsi
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+  license: LICENSE
