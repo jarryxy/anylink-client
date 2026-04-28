@@ -127,12 +127,22 @@
                 <label for="secret">密钥</label>
                 <input type="password" id="secret" v-model="config.secret" placeholder="请输入密钥">
               </div>
+
+              <div class="form-group">
+                <label for="enableOtp">OTP验证</label>
+                <label class="switch-row" for="enableOtp">
+                  <input id="enableOtp" v-model="config.enableOtp" class="switch-input" type="checkbox">
+                  <span class="switch-control" aria-hidden="true"></span>
+                </label>
+              </div>
               <button type="submit" class="save-btn">保存配置</button>
             </form>
           </div>
         </div>
       </div>
     </div>
+    <OtpCodeInput v-model:visible="otpDialogVisible" v-model="otpCode" :loading="isConnecting"
+      @confirm="handleOtpConfirm" @cancel="handleOtpCancel" />
   </div>
 </template>
 <script setup>
@@ -141,6 +151,7 @@ import { VpnAgentRpc } from '@renderer/utils/vpnAgentRpc';
 import { ipcRenderer } from 'electron';
 import { Message } from '@arco-design/web-vue';
 import NetworkStatusDot from './components/NetworkStatusDot.vue';
+import OtpCodeInput from '@renderer/components/OtpCodeInput/index.vue';
 const path = require('path');
 
 let activeDisconnect = false
@@ -215,6 +226,7 @@ onMounted(async () => {
       config.password = res.password
       config.group = res.group
       config.secret = res.group
+      config.enableOtp = Boolean(res.enableOtp)
     }
   })
 
@@ -239,7 +251,23 @@ function configVpn() {
   })
 }
 
-function connectVpn(reconnect) {
+function buildConnectParams(otp = '') {
+  const params = {
+    host: config.host,
+    username: config.username,
+    password: config.password,
+    group: config.group,
+    secret: config.secret
+  }
+
+  if (config.enableOtp && otp) {
+    params.password += otp
+  }
+
+  return params
+}
+
+function connectVpn(reconnect, otp = '') {
   if (vpnAgentRpc.isConnected()) {
     let method = 'connect'
     let id = 2
@@ -248,7 +276,7 @@ function connectVpn(reconnect) {
       id = 4
     }
     isConnecting.value = true
-    vpnAgentRpc.callAsyncParams(method, id, { ...config }, (data) => {
+    vpnAgentRpc.callAsyncParams(method, id, buildConnectParams(otp), (data) => {
       isConnecting.value = false
 
       console.log('ws ' + method + '->:', data)
@@ -362,7 +390,8 @@ const defaultConfig = {
   username: "",
   password: "",
   group: "",
-  secret: ""
+  secret: "",
+  enableOtp: false
 }
 
 const config = reactive({ ...defaultConfig })
@@ -386,6 +415,9 @@ const statusText = computed(() => {
 const connectButtonText = computed(() => {
   return m_vpnConnected.value ? '断开连接' : '立即连接'
 })
+
+const otpDialogVisible = ref(false)
+const otpCode = ref('')
 
 const validateConfig = () => {
   let isValid = true
@@ -415,9 +447,27 @@ const toggleConnection = async () => {
       activeTab.value = 'config'
       return
     }
-    connectVpn()
-    connectionTime.value = new Date().toLocaleString()
+    if (config.enableOtp) {
+      otpCode.value = ''
+      otpDialogVisible.value = true
+      return
+    }
+    startConnect()
   }
+}
+
+function startConnect(otp = '') {
+  connectVpn(false, otp)
+  connectionTime.value = new Date().toLocaleString()
+}
+
+function handleOtpConfirm(code) {
+  otpDialogVisible.value = false
+  startConnect(code)
+}
+
+function handleOtpCancel() {
+  otpCode.value = ''
 }
 
 const saveConfig = () => {
@@ -590,6 +640,63 @@ input {
 input:focus {
   outline: none;
   border-color: #409eff;
+}
+
+.switch-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+  color: #303133;
+  font-weight: 400;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.switch-control {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #c0c4cc;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.switch-control::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease;
+}
+
+.switch-input:checked+.switch-control {
+  background: #409eff;
+}
+
+.switch-input:checked+.switch-control::after {
+  transform: translateX(20px);
+}
+
+.switch-input:focus+.switch-control {
+  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.18);
 }
 
 .error {
