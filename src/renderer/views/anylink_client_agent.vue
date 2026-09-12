@@ -115,7 +115,15 @@
 
               <div class="form-group">
                 <label for="password">密码</label>
-                <input type="password" id="password" v-model="config.password" placeholder="请输入密码">
+                <div class="password-input-wrapper">
+                  <input :type="showPassword ? 'text' : 'password'" id="password" v-model="config.password"
+                    placeholder="请输入密码">
+                  <button class="password-toggle" type="button" :aria-label="showPassword ? '隐藏密码' : '显示密码'"
+                    :title="showPassword ? '隐藏密码' : '显示密码'" @click="showPassword = !showPassword">
+                    <icon-eye v-if="!showPassword" />
+                    <icon-eye-invisible v-else />
+                  </button>
+                </div>
               </div>
 
               <div class="form-group">
@@ -395,6 +403,7 @@ const defaultConfig = {
 }
 
 const config = reactive({ ...defaultConfig })
+const showPassword = ref(false)
 const errors = reactive({
   host: '',
   username: ''
@@ -640,6 +649,42 @@ input {
 input:focus {
   outline: none;
   border-color: #409eff;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: #86909c;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.password-toggle:hover {
+  color: #409eff;
+  background: #f2f3f5;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid rgba(64, 158, 255, 0.45);
+  outline-offset: 1px;
 }
 
 .switch-row {
