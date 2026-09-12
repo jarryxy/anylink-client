@@ -45,9 +45,9 @@ function getBinPath() {
 
   if (isPackaged) {
     agentName = "anylink_client_agent";
-  if (platform === "win32") {
-    agentName = "anylink_client_agent.exe";
-  }
+    if (platform === "win32") {
+      agentName = "anylink_client_agent.exe";
+    }
     binPath = path.join(process.resourcesPath, "bin", agentName);
   } else {
     agentName = getAgentName();
@@ -116,7 +116,7 @@ export default {
   ReInstallVpnAgent() {
     return new Promise((resolve, reject) => {
       sudo.exec(
-        vpnagent + " reinstall",
+        `'${vpnagent}' reinstall`,
         {
           name: execName,
         },
