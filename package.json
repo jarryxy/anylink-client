@@ -1,7 +1,7 @@
 {
   "name": "anylink-client",
   "appName": "Anylink Client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "jiaxiaoyu <jarryxy@qq.com>",
   "main": "./dist/electron/main.js",
   "homepage": "https://github.com/jarryxy/anylink-client",
@@ -10,7 +10,8 @@
     "build:win": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && cross-env AGENT_ARCH=386 electron-builder --win --ia32 && cross-env AGENT_ARCH=amd64 electron-builder --win --x64 && cross-env AGENT_ARCH=arm64 electron-builder --win --arm64",
     "build:mac": "cross-env BUILD_TARGET=clean node .electron-vue/build.js &&  cross-env AGENT_ARCH=amd64 electron-builder --mac --x64 && cross-env AGENT_ARCH=arm64 electron-builder --mac --arm64",
     "build:linux": "cross-env BUILD_TARGET=clean node .electron-vue/build.js  && cross-env AGENT_ARCH=amd64 electron-builder --linux --x64 && cross-env AGENT_ARCH=arm electron-builder --linux --armv7l && cross-env AGENT_ARCH=arm64 electron-builder --linux --arm64",
-    "build:all": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && cross-env AGENT_ARCH=386 electron-builder --win --ia32 && cross-env AGENT_ARCH=amd64 electron-builder --win --x64 && cross-env AGENT_ARCH=arm64 electron-builder --win --arm64 && cross-env AGENT_ARCH=amd64 electron-builder --mac --x64 && cross-env AGENT_ARCH=arm64 electron-builder --mac --arm64  && cross-env AGENT_ARCH=amd64 electron-builder --linux --x64 && cross-env AGENT_ARCH=arm electron-builder --linux --armv7l && cross-env AGENT_ARCH=arm64 electron-builder --linux --arm64",    "build:dir": "cross-env BUILD_TARGET=clean node .electron-vue/build.js  && electron-builder --dir",
+    "build:all": "cross-env BUILD_TARGET=clean node .electron-vue/build.js && cross-env AGENT_ARCH=386 electron-builder --win --ia32 && cross-env AGENT_ARCH=amd64 electron-builder --win --x64 && cross-env AGENT_ARCH=arm64 electron-builder --win --arm64 && cross-env AGENT_ARCH=amd64 electron-builder --mac --x64 && cross-env AGENT_ARCH=arm64 electron-builder --mac --arm64  && cross-env AGENT_ARCH=amd64 electron-builder --linux --x64 && cross-env AGENT_ARCH=arm electron-builder --linux --armv7l && cross-env AGENT_ARCH=arm64 electron-builder --linux --arm64",
+    "build:dir": "cross-env BUILD_TARGET=clean node .electron-vue/build.js  && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=onlyClean node .electron-vue/build.js"
   },
   "dependencies": {
