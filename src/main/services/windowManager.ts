@@ -63,6 +63,24 @@ class MainInit {
     const menu = Menu.buildFromTemplate(menuconfig as any)
     // 加载模板
     Menu.setApplicationMenu(menu)
+    // 自定义应用菜单会替换 Electron 默认菜单。保留标准编辑快捷键，
+    // 并在页面脚本拦截键盘事件时通过 webContents 执行原生编辑操作。
+    this.mainWindow.webContents.on('before-input-event', (event, input) => {
+      if (input.type !== 'keyDown' || (!input.control && !input.meta)) return
+
+      const key = input.key.toLowerCase()
+      const editActions = {
+        a: 'selectAll',
+        c: 'copy',
+        x: 'cut',
+        v: 'paste'
+      } as const
+      const action = editActions[key as keyof typeof editActions]
+      if (!action) return
+
+      event.preventDefault()
+      this.mainWindow.webContents[action]()
+    })
     // 加载主窗口
     this.mainWindow.loadURL(this.winURL)
     // dom-ready之后显示界面
